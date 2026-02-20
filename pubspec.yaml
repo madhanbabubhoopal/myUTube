@@ -1,0 +1,45 @@
+name: kidstube
+description: A YouTube-style local video player for kids. Works fully offline.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Video playback
+  video_player: ^2.8.1
+  chewie: ^1.7.4
+
+  # Media library scanning (reads device media store)
+  photo_manager: ^3.0.0
+
+  # Thumbnail generation from video first frame
+  video_thumbnail: ^0.5.3
+
+  # Runtime permission requests
+  permission_handler: ^11.0.1
+
+  # State management
+  provider: ^6.1.1
+
+  # File system paths (app cache dir for thumbnails)
+  path_provider: ^2.1.1
+
+  # Settings persistence
+  shared_preferences: ^2.2.2
+
+  # Staggered list entry animations
+  flutter_staggered_animations: ^1.1.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
+  # No asset files — logo uses CustomPainter, thumbnails generated at runtime
