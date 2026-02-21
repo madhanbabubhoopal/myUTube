@@ -1,0 +1,50 @@
+name: Build KidsTube APK
+
+on:
+  push:
+    branches:
+      - 'claude/offline-youtube-flutter-app-qfEO1'
+      - main
+  workflow_dispatch:   # allows manual trigger from the Actions tab
+
+jobs:
+  build-apk:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Flutter (stable)
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      # android/local.properties is gitignored; create it from CI env vars
+      - name: Create android/local.properties
+        run: |
+          echo "sdk.dir=$ANDROID_SDK_ROOT"      > android/local.properties
+          echo "flutter.sdk=$FLUTTER_ROOT"      >> android/local.properties
+          echo "flutter.buildMode=release"      >> android/local.properties
+          echo "flutter.versionName=1.0.0"      >> android/local.properties
+          echo "flutter.versionCode=1"          >> android/local.properties
+
+      - name: Install Flutter packages
+        run: flutter pub get
+
+      - name: Build release APK
+        run: flutter build apk --release
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: kidstube-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
