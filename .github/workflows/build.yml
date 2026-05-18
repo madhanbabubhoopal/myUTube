@@ -38,20 +38,14 @@ jobs:
 
       - name: Re-initialize Android Project
         run: |
-          # 1. Backup the Manifest (crucial for permissions)
+          # Backup custom manifest
           cp android/app/src/main/AndroidManifest.xml AndroidManifest.xml.bak
-          
-          # 2. Nuke the folder
+          # Clean start
           rm -rf android
-          
-          # 3. Recreate it using the current Flutter version's template
-          # We use the correct org name found in the previous errors
           flutter create . --platforms android --org com.kidstube.app
-          
-          # 4. Restore the custom permissions and configuration
+          # Restore custom manifest
           cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
-          
-          # 5. Set version info
+          # Set versioning
           echo "flutter.versionName=${GITHUB_REF_NAME#v}" >> android/local.properties
           echo "flutter.versionCode=${GITHUB_RUN_NUMBER}" >> android/local.properties
 
@@ -92,9 +86,19 @@ jobs:
         with:
           name: kidstube-release-apk
 
-      - name: Run Firebase Robo Test
-        uses: asadmansoor/android-test-lab-action@v1.2
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
         with:
-          arg-spec: 'robo --app app-release.apk --device model=redfin,version=30 --timeout 2m --robo-directives text:parental_pin_field=1234'
-        env:
-          SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Run Firebase Robo Test
+        run: |
+          gcloud firebase test android run \
+            --type robo \
+            --app app-release.apk \
+            --device model=redfin,version=30 \
+            --timeout 2m \
+            --robo-directives text:parental_pin_field=1234
