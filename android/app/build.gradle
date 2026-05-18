@@ -1,6 +1,5 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -25,20 +24,6 @@ if (flutterVersionName == null) {
 android {
     namespace "com.kidstube.app"
     compileSdkVersion 34
-    ndkVersion "25.1.8937393"
-
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
-        targetCompatibility JavaVersion.VERSION_17
-    }
-
-    kotlinOptions {
-        jvmTarget = '17'
-    }
-
-    sourceSets {
-        main.java.srcDirs += 'src/main/kotlin'
-    }
 
     defaultConfig {
         applicationId "com.kidstube.app"
@@ -57,7 +42,4 @@ android {
 
 flutter {
     source '../..'
-}
-
-dependencies {
 }
