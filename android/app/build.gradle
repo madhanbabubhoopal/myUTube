@@ -1,6 +1,6 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -24,21 +24,21 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.kidstube.app"
-    compileSdkVersion 34
+    compileSdkVersion 35
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_11
-        targetCompatibility JavaVersion.VERSION_11
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = '11'
+        jvmTarget = '17'
     }
 
     defaultConfig {
         applicationId "com.kidstube.app"
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
