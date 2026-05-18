@@ -38,13 +38,20 @@ jobs:
 
       - name: Re-initialize Android Project
         run: |
-          # Nuke the potentially corrupted android folder
+          # 1. Backup the Manifest (crucial for permissions)
+          cp android/app/src/main/AndroidManifest.xml AndroidManifest.xml.bak
+          
+          # 2. Nuke the folder
           rm -rf android
-          # Recreate it using the current Flutter version's template
-          flutter create . --platforms android --org com.kidstube
-          # Restore the custom permissions and configuration
+          
+          # 3. Recreate it using the current Flutter version's template
+          # We use the correct org name found in the previous errors
+          flutter create . --platforms android --org com.kidstube.app
+          
+          # 4. Restore the custom permissions and configuration
           cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
-          # Set the version info in local.properties
+          
+          # 5. Set version info
           echo "flutter.versionName=${GITHUB_REF_NAME#v}" >> android/local.properties
           echo "flutter.versionCode=${GITHUB_RUN_NUMBER}" >> android/local.properties
 
