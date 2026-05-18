@@ -51,7 +51,11 @@ jobs:
         run: flutter test
 
       - name: Build release APK
-        run: flutter build apk --release --no-pub --android-skip-build-dependency-validation
+        run: |
+          # The custom-compile-fix ensures the internal Flutter tool compiles correctly
+          # before running the actual APK build task.
+          ./gradlew :gradle:compileKotlin
+          flutter build apk --release --no-pub
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
