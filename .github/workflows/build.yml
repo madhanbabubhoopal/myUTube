@@ -64,3 +64,22 @@ jobs:
           generate_release_notes: true
           draft: false
           prerelease: false
+
+  robo-test:
+    needs: build-apk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Download APK artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: kidstube-release-apk
+
+      - name: Run Firebase Robo Test
+        uses: asadmansoor/android-test-lab-action@v1.2
+        with:
+          arg-spec: 'robo --app app-release.apk --device model=redfin,version=30 --timeout 2m --robo-directives text:parental_pin_field=1234'
+        env:
+          SERVICE_ACCOUNT_KEY: ${{ secrets.GCP_SA_KEY }}
