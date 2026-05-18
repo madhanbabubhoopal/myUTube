@@ -1,6 +1,6 @@
 plugins {
     id "com.android.application"
-    id "kotlin-android"
+    id "org.jetbrains.kotlin.android"
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -24,7 +24,7 @@ if (flutterVersionName == null) {
 
 android {
     namespace "com.kidstube.app"
-    compileSdkVersion 34
+    compileSdkVersion 35
     ndkVersion "25.1.8937393"
 
     compileOptions {
@@ -43,7 +43,7 @@ android {
     defaultConfig {
         applicationId "com.kidstube.app"
         minSdkVersion 24
-        targetSdkVersion 34
+        targetSdkVersion 35
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
@@ -62,4 +62,6 @@ flutter {
 }
 
 dependencies {
+    // These should be provided by Flutter, but we'll try explicitly adding them
+    // to see if it resolves the resolution error on CI.
 }
