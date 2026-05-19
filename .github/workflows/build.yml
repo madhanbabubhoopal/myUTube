@@ -36,26 +36,41 @@ jobs:
         with:
           gradle-version: wrapper
 
-      - name: Bulletproof Project Setup
+      - name: Bulletproof Project Setup (Groovy Only)
         run: |
-          # 1. Ensure AndroidManifest.xml is backed up if it exists anywhere
+          # 1. Prepare the backup manifest
           if [ -f android/app/src/main/AndroidManifest.xml ]; then
             cp android/app/src/main/AndroidManifest.xml AndroidManifest.xml.bak
-          elif [ -f AndroidManifest.xml.bak ]; then
-            echo "Using existing root backup"
           fi
           
-          # 2. Always recreate the android folder to ensure version alignment
+          # 2. Recreate with modern template
           rm -rf android
           flutter create . --platforms android --org com.kidstube.app
           
-          # 3. Restore the custom manifest (crucial for permissions)
-          if [ -f AndroidManifest.xml.bak ]; then
-            mkdir -p android/app/src/main
-            cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
-          fi
+          # 3. Nuke Kotlin DSL files to avoid mixing
+          find android -name "*.kts" -delete
           
-          # 4. Force STABLE Gradle/Kotlin versions
+          # 4. Write Stable Groovy Top-level build.gradle
+          cat <<EOF > android/build.gradle
+          allprojects {
+              repositories {
+                  google()
+                  mavenCentral()
+              }
+          }
+          rootProject.buildDir = '../build'
+          subprojects {
+              project.buildDir = "\${rootProject.buildDir}/\${project.name}"
+          }
+          subprojects {
+              project.evaluationDependsOn(':app')
+          }
+          task clean(type: Delete) {
+              delete rootProject.buildDir
+          }
+          EOF
+
+          # 5. Write Stable Groovy settings.gradle
           cat <<EOF > android/settings.gradle
           pluginManagement {
               def flutterSdkPath = {
@@ -79,6 +94,49 @@ jobs:
           }
           include ":app"
           EOF
+
+          # 6. Write Stable Groovy app/build.gradle
+          cat <<EOF > android/app/build.gradle
+          plugins {
+              id "com.android.application"
+              id "kotlin-android"
+              id "dev.flutter.flutter-gradle-plugin"
+          }
+          def localProperties = new Properties()
+          def localPropertiesFile = rootProject.file('local.properties')
+          if (localPropertiesFile.exists()) {
+              localPropertiesFile.withReader('UTF-8') { reader ->
+                  localProperties.load(reader)
+              }
+          }
+          def flutterVersionCode = localProperties.getProperty('flutter.versionCode') ?: '1'
+          def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '1.0'
+          android {
+              namespace "com.kidstube.app"
+              compileSdkVersion 34
+              defaultConfig {
+                  applicationId "com.kidstube.app"
+                  minSdkVersion 24
+                  targetSdkVersion 34
+                  versionCode flutterVersionCode.toInteger()
+                  versionName flutterVersionName
+              }
+              buildTypes {
+                  release {
+                      signingConfig signingConfigs.debug
+                  }
+              }
+          }
+          flutter {
+              source '../..'
+          }
+          EOF
+
+          # 7. Restore the custom manifest
+          if [ -f AndroidManifest.xml.bak ]; then
+            mkdir -p android/app/src/main
+            cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
+          fi
 
       - name: Create local.properties
         run: |
