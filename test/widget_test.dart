@@ -72,27 +72,32 @@ void main() {
 
     // 2. Tab to Profile
     await tester.tap(find.text('Profile'));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 1));
     
     // 3. Unlock with PIN
     await tester.enterText(find.byType(TextField), '1234');
     await tester.tap(find.text('Unlock'));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 1));
 
     // 4. Open Admin UI
-    await tester.tap(find.text('Manage Approved Videos'));
-    await tester.pump(const Duration(milliseconds: 500));
+    // Ensure we can see the button (might need scrolling)
+    final adminBtn = find.text('Manage Approved Videos');
+    await tester.ensureVisible(adminBtn);
+    await tester.tap(adminBtn);
+    await tester.pump(const Duration(seconds: 1));
     
     // 5. Toggle Daniel Episode 1
-    await tester.tap(find.textContaining('Daniel').first);
-    await tester.pump(const Duration(milliseconds: 500));
+    final danielFinder = find.textContaining('Daniel');
+    await tester.ensureVisible(danielFinder.first);
+    await tester.tap(danielFinder.first);
+    await tester.pump(const Duration(seconds: 1));
 
     // 6. Return Home
     await tester.tap(find.byIcon(Icons.arrow_back));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 1));
     
     await tester.tap(find.text('Home'));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(seconds: 1));
 
     // 7. Final Success Check
     expect(find.byType(VideoCard), findsNWidgets(2));
