@@ -40,7 +40,7 @@ The project is fully aligned with the modernized declarative Gradle structure. L
 | **AGP** | `8.11.1` | Android Gradle Plugin |
 | **Kotlin** | `2.1.0` (`kotlin-android`) | Language Runtime |
 | **JDK** | `17` | Compilation Environment |
-| **Target SDK** | `35` | Android API Level |
+| **Target SDK** | `34` | Android 14 (Stable Baseline) |
 
 ## Mandatory Flags (gradle.properties)
 | Flag | Value | Why? |
@@ -51,6 +51,6 @@ The project is fully aligned with the modernized declarative Gradle structure. L
 
 ## Strategy for Smooth Builds
 1. **Single Source of Truth:** All versioning MUST stay in `settings.gradle`.
-2. **Explicit Repositories:** Keep `allprojects` in `build.gradle` with the Flutter Maven URL (`https://storage.googleapis.com/download.flutter.io`) to ensure background compilation tasks (like Kotlin) have immediate access to SDK classes.
-3. **Root build.gradle:** Keep it clean except for shared repositories.
+2. **Plugin Order:** Apply Flutter plugin FIRST in `settings.gradle` and LAST in `app/build.gradle` to ensure dependency injection.
+3. **Explicit Repositories:** Keep `allprojects` in `build.gradle` with the Flutter Maven URL.
 3. **Resource Protection:** Do not modify `android/app/src/main/res` without verifying existence.

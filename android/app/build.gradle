@@ -1,7 +1,7 @@
 plugins {
     id "com.android.application"
-    id "dev.flutter.flutter-gradle-plugin"
     id "kotlin-android"
+    id "dev.flutter.flutter-gradle-plugin"
 }
 
 def localProperties = new Properties()
@@ -17,12 +17,12 @@ def flutterVersionName = localProperties.getProperty('flutter.versionName') ?: '
 
 android {
     namespace "com.kidstube.app"
-    compileSdkVersion 35
+    compileSdkVersion 34
     
     defaultConfig {
         applicationId "com.kidstube.app"
         minSdkVersion 24
-        targetSdkVersion 35
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
     }
