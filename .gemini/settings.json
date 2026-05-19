@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "BeforeTool": [
+      {
+        "id": "enforce-state-of-truth",
+        "command": "sh .gemini/hooks/verify-state-of-truth.sh",
+        "filter": {
+          "tool": "run_shell_command",
+          "pattern": "git\\s+(commit|push)"
+        }
+      }
+    ]
+  }
+}
