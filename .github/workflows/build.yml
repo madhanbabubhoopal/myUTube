@@ -36,16 +36,26 @@ jobs:
         with:
           gradle-version: wrapper
 
-      - name: Repair and Standardize Project
+      - name: Bulletproof Project Setup
         run: |
-          # Ensure a fresh, compatible android folder without nuking everything 
-          # every time (only if it's missing or broken)
-          if [ ! -d "android" ]; then
-            flutter create . --platforms android --org com.kidstube.app
+          # 1. Ensure AndroidManifest.xml is backed up if it exists anywhere
+          if [ -f android/app/src/main/AndroidManifest.xml ]; then
+            cp android/app/src/main/AndroidManifest.xml AndroidManifest.xml.bak
+          elif [ -f AndroidManifest.xml.bak ]; then
+            echo "Using existing root backup"
           fi
           
-          # Force AGP 8.1.0 and Kotlin 1.9.22 for stability
-          # This overrides whatever fresh 'flutter create' might have generated
+          # 2. Always recreate the android folder to ensure version alignment
+          rm -rf android
+          flutter create . --platforms android --org com.kidstube.app
+          
+          # 3. Restore the custom manifest (crucial for permissions)
+          if [ -f AndroidManifest.xml.bak ]; then
+            mkdir -p android/app/src/main
+            cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
+          fi
+          
+          # 4. Force STABLE Gradle/Kotlin versions
           cat <<EOF > android/settings.gradle
           pluginManagement {
               def flutterSdkPath = {
@@ -86,8 +96,6 @@ jobs:
 
       - name: Build release APK
         run: |
-          # Use --no-pub because we did it already
-          # Skip dependency validation to avoid the jcenter error in old plugins
           flutter build apk --release --no-pub --android-skip-build-dependency-validation
 
       - name: Upload APK artifact
