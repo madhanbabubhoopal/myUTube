@@ -67,38 +67,34 @@ void main() {
     final mockProvider = MockVideoProvider();
     await mockProvider.init();
 
-    // Start App with the mock provider
+    // Start App
     await tester.pumpWidget(KidsTubeApp(provider: mockProvider));
-    await tester.pump(); // Initial frame
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Verify initial approved video is visible
     expect(find.text('Welcome to KidsTube'), findsOneWidget);
     expect(find.text('Daniel Episode 1'), findsNothing);
 
-    // Navigate to Settings (Profile tab)
+    // Navigate to Settings
     await tester.tap(find.byIcon(Icons.person_outline));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Enter PIN
     await tester.enterText(find.byType(TextField), '1234');
     await tester.tap(find.text('Unlock'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Approve Video
     await tester.tap(find.text('Manage Approved Videos'));
-    await tester.pumpAndSettle();
-    
-    // Tap Daniel Episode 1 (it's a CheckboxListTile)
+    await tester.pump(const Duration(milliseconds: 500));
     await tester.tap(find.text('Daniel Episode 1'));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Back to Home
     await tester.tap(find.byIcon(Icons.arrow_back));
-    await tester.pumpAndSettle();
-    
-    // Tap Home icon in BottomNav
+    await tester.pump(const Duration(milliseconds: 500));
     await tester.tap(find.byIcon(Icons.home_outlined));
-    await tester.pumpAndSettle();
+    await tester.pump(const Duration(milliseconds: 500));
 
     // Verify visibility
     expect(find.text('Daniel Episode 1'), findsOneWidget);
