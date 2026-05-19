@@ -67,36 +67,38 @@ void main() {
     await tester.pumpWidget(KidsTubeApp(provider: mockProvider));
     await tester.pump(); 
 
-    // 1. Initial State
+    // 1. Landing Page
     expect(find.text('Welcome to KidsTube'), findsWidgets);
 
-    // 2. Settings -> PIN
+    // 2. Tab to Profile
     await tester.tap(find.text('Profile'));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle(const Duration(milliseconds: 500));
     
+    // 3. Unlock with PIN
     await tester.enterText(find.byType(TextField), '1234');
     await tester.tap(find.text('Unlock'));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
-    // 3. Collection Management
-    expect(find.text('Manage Approved Videos'), findsOneWidget);
+    // 4. Open Admin UI
     await tester.tap(find.text('Manage Approved Videos'));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle(const Duration(milliseconds: 500));
     
-    // 4. Toggle Approval
-    final danielFinder = find.textContaining('Daniel');
-    expect(danielFinder, findsWidgets);
-    await tester.tap(danielFinder.first);
-    await tester.pump(const Duration(milliseconds: 500));
+    // 5. Toggle Daniel Episode 1
+    // Instead of text, find by type and check title
+    final tiles = tester.widgetList<CheckboxListTile>(find.byType(CheckboxListTile));
+    expect(tiles.length, 2);
+    
+    await tester.tap(find.text('Daniel Episode 1'));
+    await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
-    // 5. Back to Home
+    // 6. Return Home
     await tester.tap(find.byIcon(Icons.arrow_back));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle(const Duration(milliseconds: 500));
     
     await tester.tap(find.text('Home'));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
-    // 6. Verify Visibility
+    // 7. Success Check
     expect(find.byType(VideoCard), findsNWidgets(2));
   });
 }
