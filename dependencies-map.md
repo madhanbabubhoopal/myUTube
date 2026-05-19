@@ -42,6 +42,13 @@ The project is fully aligned with the modernized declarative Gradle structure. L
 | **JDK** | `17` | Compilation Environment |
 | **Target SDK** | `35` | Android API Level |
 
+## Mandatory Flags (gradle.properties)
+| Flag | Value | Why? |
+| :--- | :--- | :--- |
+| `android.builtInKotlin` | `true` | Enables modern Flutter-Kotlin integration. |
+| `android.newDsl` | `true` | Required for declarative plugin management. |
+| `android.useAndroidX` | `true` | Standard for modern Android development. |
+
 ## Strategy for Smooth Builds
 1. **Single Source of Truth:** All versioning MUST stay in `settings.gradle`.
 2. **Root build.gradle:** Keep it clean. No plugin versions or dependencies should be added here.
