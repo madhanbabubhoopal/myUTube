@@ -72,36 +72,27 @@ void main() {
 
     // 2. Tab to Profile
     await tester.tap(find.text('Profile'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
     
     // 3. Unlock with PIN
     await tester.enterText(find.byType(TextField), '1234');
     await tester.tap(find.text('Unlock'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
 
     // 4. Open Admin UI
     await tester.tap(find.text('Manage Approved Videos'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
     
-    // 5. Success Check
-    // If text search fails, let's look for ANY checkbox and click it
-    final checkboxFinder = find.byType(Checkbox);
-    if (checkboxFinder.evaluate().isNotEmpty) {
-      await tester.tap(checkboxFinder.last); // The last one is Daniel Episode 1
-    } else {
-      // Fallback: search by text again but with debug info
-      debugPrint('WIDGET TREE:');
-      debugDumpApp();
-      await tester.tap(find.textContaining('Daniel').first);
-    }
-    await tester.pumpAndSettle(const Duration(milliseconds: 500));
+    // 5. Toggle Daniel Episode 1
+    await tester.tap(find.textContaining('Daniel').first);
+    await tester.pump(const Duration(milliseconds: 500));
 
     // 6. Return Home
     await tester.tap(find.byIcon(Icons.arrow_back));
-    await tester.pumpAndSettle(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
     
     await tester.tap(find.text('Home'));
-    await tester.pumpAndSettle(const Duration(milliseconds: 500));
+    await tester.pump(const Duration(milliseconds: 500));
 
     // 7. Final Success Check
     expect(find.byType(VideoCard), findsNWidgets(2));

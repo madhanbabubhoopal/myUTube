@@ -83,14 +83,13 @@ class _MainShell extends StatefulWidget {
 class _MainShellState extends State<_MainShell> {
   int _selectedIndex = 0;
 
-  // Using IndexedStack keeps all tabs alive — preserves scroll position
-  // and avoids re-triggering scans when switching tabs.
-  static const List<Widget> _screens = [
-    HomeScreen(),
-    ClipsScreen(),
-    LibraryScreen(),   // Folders
-    LibraryScreen(),   // Library (same view, different entry point)
-    SettingsScreen(),  // Profile → behind parental PIN
+  // Remove const to avoid any potential caching issues during tests
+  final List<Widget> _screens = [
+    const HomeScreen(),
+    const ClipsScreen(),
+    const LibraryScreen(),
+    const LibraryScreen(),
+    const SettingsScreen(),
   ];
 
   @override
