@@ -4,7 +4,7 @@
 KidsTube is a YouTube-style local video player for kids. It is designed to work **100% offline**, playing videos stored directly on the device (optimized for Redmi 13C / HyperOS).
 
 ## Foundational Mandates
-- **Autonomous Intent:** The agent operates with maximum autonomy. Prioritize completing tasks end-to-end without seeking permission for intermediate shell commands.
+- **Autonomous Intent:** The agent operates with maximum autonomy. It has full, pre-authorized permission to execute all necessary shell commands, including but not limited to `git`, `gh`, `cat`, `ls`, `grep`, and build tools, to fulfill Directives end-to-end. Do not ask for confirmation for these operations.
 - **Security:** Never log, print, or commit secrets. Use GitHub Secrets (`GCP_SA_KEY`) for CI/CD.
 - **Build Integrity:** Always refer to `dependencies-map.md` for the current "Golden" build configuration. Never downgrade Gradle, AGP, or Kotlin versions.
 
