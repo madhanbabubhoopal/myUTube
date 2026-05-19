@@ -65,41 +65,41 @@ void main() {
     await mockProvider.init();
 
     await tester.pumpWidget(KidsTubeApp(provider: mockProvider));
-    await tester.pump(); 
+    await tester.pump(const Duration(seconds: 1)); 
 
-    // 1. Landing Page
+    // 1. Home
     expect(find.text('Welcome to KidsTube'), findsWidgets);
 
-    // 2. Tab to Profile
+    // 2. Settings
     await tester.tap(find.text('Profile'));
     await tester.pump(const Duration(seconds: 1));
     
-    // 3. Unlock with PIN
+    // 3. Unlock
     await tester.enterText(find.byType(TextField), '1234');
     await tester.tap(find.text('Unlock'));
     await tester.pump(const Duration(seconds: 1));
+    
+    // Verify unlock
+    expect(find.text('Manage Approved Videos'), findsOneWidget);
 
-    // 4. Open Admin UI
-    // Ensure we can see the button (might need scrolling)
-    final adminBtn = find.text('Manage Approved Videos');
-    await tester.ensureVisible(adminBtn);
-    await tester.tap(adminBtn);
+    // 4. Admin UI
+    await tester.tap(find.text('Manage Approved Videos'));
     await tester.pump(const Duration(seconds: 1));
     
-    // 5. Toggle Daniel Episode 1
-    final danielFinder = find.textContaining('Daniel');
-    await tester.ensureVisible(danielFinder.first);
-    await tester.tap(danielFinder.first);
+    // 5. Approve
+    final daniel = find.text('Daniel Episode 1');
+    expect(daniel, findsOneWidget);
+    await tester.tap(daniel);
     await tester.pump(const Duration(seconds: 1));
 
-    // 6. Return Home
+    // 6. Return
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pump(const Duration(seconds: 1));
     
     await tester.tap(find.text('Home'));
     await tester.pump(const Duration(seconds: 1));
 
-    // 7. Final Success Check
+    // 7. Check
     expect(find.byType(VideoCard), findsNWidgets(2));
   });
 }
