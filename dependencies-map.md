@@ -13,23 +13,24 @@ The project is fully aligned with the modernized declarative Gradle structure. L
        |
        |--- [ android/settings.gradle ] (Declarative Source of Truth)
        |      |-- AGP (com.android.application): 8.11.1
-       |      |-- Kotlin (org.jetbrains.kotlin.android): 2.2.20
+       |      |-- Kotlin (org.jetbrains.kotlin.android): 2.1.0 (apply false)
        |      |-- Flutter Gradle Plugin: 1.0.0
        |
        |--- [ android/gradle-wrapper.properties ]
        |      |-- Gradle Version: 8.14 (Supports JDK 17, AGP 8.11)
        |
        |--- [ android/app/build.gradle ]
-       |      |-- Compile/Target SDK: 35 (Android 15)
-       |      |-- Java/Kotlin Compatibility: 17
+       |      |-- Compile/Target SDK: 34 (Android 14)
+       |      |-- Java Compatibility: 17
+       |      |-- Language: Java (Fallback verification baseline)
        |      |-- Namespace: com.kidstube.app
 ```
 
 ## Moving Parts & Current Baseline
 1. **Gradle/AGP:** Gradle 8.14 + AGP 8.11.1. This is the latest stable pairing for Flutter 3.44.
-2. **Built-in Kotlin:** Successfully migrated to the declarative `plugins` block. Legacy `buildscript` and `allprojects` blocks have been removed from the root `android/build.gradle`.
+2. **Java Fallback:** Temporarily switched to `MainActivity.java` to verify Flutter SDK linking while bypassing Kotlin toolchain issues.
 3. **Android Resources:** `AndroidManifest.xml` uses `@android:drawable/ic_menu_gallery` as a temporary placeholder icon. 
-4. **CI/CD:** GitHub Action runners are configured with Node 20 and JDK 17 to match the build requirements.
+4. **CI/CD:** GitHub Action runners are configured with Node 20 and JDK 17.
 
 ## Golden Configuration Reference
 
@@ -38,7 +39,7 @@ The project is fully aligned with the modernized declarative Gradle structure. L
 | **Flutter** | `stable` | Framework SDK |
 | **Gradle** | `8.14` | Build Automation |
 | **AGP** | `8.11.1` | Android Gradle Plugin |
-| **Kotlin** | `2.1.0` (`kotlin-android`) | Language Runtime |
+| **Language** | `Java 17` (Fallback) | Verification Baseline |
 | **JDK** | `17` | Compilation Environment |
 | **Target SDK** | `34` | Android 14 (Stable Baseline) |
 
@@ -51,6 +52,6 @@ The project is fully aligned with the modernized declarative Gradle structure. L
 
 ## Strategy for Smooth Builds
 1. **Single Source of Truth:** All versioning MUST stay in `settings.gradle`.
-2. **Plugin Order:** Apply Flutter plugin FIRST in `settings.gradle` and LAST in `app/build.gradle` to ensure dependency injection.
+2. **Java Baseline:** Using `MainActivity.java` to verify Flutter SDK linking, bypassing Kotlin issues.
 3. **Explicit Repositories:** Keep `allprojects` in `build.gradle` with the Flutter Maven URL.
-3. **Resource Protection:** Do not modify `android/app/src/main/res` without verifying existence.
+4. **Resource Protection:** Do not modify `android/app/src/main/res` without verifying existence.
