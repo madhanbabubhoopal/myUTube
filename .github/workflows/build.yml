@@ -60,6 +60,10 @@ jobs:
       - name: Build release APK
         run: flutter build apk --release
 
+      - name: Show diff on failure
+        if: failure()
+        run: git diff
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
