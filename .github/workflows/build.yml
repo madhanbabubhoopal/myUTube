@@ -38,16 +38,27 @@ jobs:
 
       - name: Re-initialize Android Project
         run: |
-          # Backup custom manifest
-          cp android/app/src/main/AndroidManifest.xml AndroidManifest.xml.bak
-          # Clean start
+          # 1. Prepare the backup manifest
+          if [ -f android/app/src/main/AndroidManifest.xml ]; then
+            cp android/app/src/main/AndroidManifest.xml AndroidManifest.xml.bak
+          fi
+
+          # 2. Nuke the folder
           rm -rf android
+
+          # 3. Recreate it
           flutter create . --platforms android --org com.kidstube.app
-          # Restore custom manifest
-          cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
-          # Set versioning
-          echo "flutter.versionName=${GITHUB_REF_NAME#v}" >> android/local.properties
-          echo "flutter.versionCode=${GITHUB_RUN_NUMBER}" >> android/local.properties
+
+          # 4. Restore the custom manifest from root backup
+          if [ -f AndroidManifest.xml.bak ]; then
+            mkdir -p android/app/src/main
+            cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
+          fi
+
+          # 5. Set versioning
+          echo "flutter.versionName=\${GITHUB_REF_NAME#v}" >> android/local.properties
+          echo "flutter.versionCode=\${GITHUB_RUN_NUMBER}" >> android/local.properties
+
 
       - name: Install Flutter packages
         run: flutter pub get
