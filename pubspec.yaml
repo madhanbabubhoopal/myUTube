@@ -11,25 +11,23 @@ dependencies:
     sdk: flutter
 
   # Video playback
-  video_player: ^2.8.1
-  chewie: ^1.7.4
+  video_player: ^2.11.1
+  chewie: ^1.14.1
 
   # Media library scanning (reads device media store)
-  photo_manager: ^3.0.0
-
-  # Thumbnail generation from video first frame
+  photo_manager: ^3.9.0
 
   # Runtime permission requests
-  permission_handler: ^11.0.1
+  permission_handler: ^12.0.1
 
   # State management
-  provider: ^6.1.1
+  provider: ^6.1.5+1
 
   # File system paths (app cache dir for thumbnails)
-  path_provider: ^2.1.1
+  path_provider: ^2.1.5
 
   # Settings persistence
-  shared_preferences: ^2.2.2
+  shared_preferences: ^2.5.5
 
   # Staggered list entry animations
   flutter_staggered_animations: ^1.1.1

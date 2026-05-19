@@ -36,30 +36,13 @@ jobs:
         with:
           gradle-version: wrapper
 
-      - name: Bulletproof Project Setup
-        run: |
-          # 1. Prepare backup
-          if [ -f android/app/src/main/AndroidManifest.xml ]; then
-            cp android/app/src/main/AndroidManifest.xml AndroidManifest.xml.bak
-          fi
-          
-          # 2. Recreate folder
-          rm -rf android
-          flutter create . --platforms android --org com.kidstube.app
-          
-          # 3. Restore manifest
-          if [ -f AndroidManifest.xml.bak ]; then
-            mkdir -p android/app/src/main
-            cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
-          fi
-
       - name: Create local.properties
         run: |
-          echo "sdk.dir=\$ANDROID_SDK_ROOT"      > android/local.properties
-          echo "flutter.sdk=\$FLUTTER_ROOT"      >> android/local.properties
+          echo "sdk.dir=$ANDROID_SDK_ROOT"      > android/local.properties
+          echo "flutter.sdk=$FLUTTER_ROOT"      >> android/local.properties
           echo "flutter.buildMode=release"      >> android/local.properties
-          echo "flutter.versionName=\${GITHUB_REF_NAME#v}" >> android/local.properties
-          echo "flutter.versionCode=\${GITHUB_RUN_NUMBER}" >> android/local.properties
+          echo "flutter.versionName=${GITHUB_REF_NAME#v}" >> android/local.properties
+          echo "flutter.versionCode=${GITHUB_RUN_NUMBER}" >> android/local.properties
 
       - name: Install Flutter packages
         run: flutter pub get
@@ -68,11 +51,7 @@ jobs:
         run: flutter test
 
       - name: Build release APK
-        run: |
-          # NO HACKS. Just pure flutter build.
-          # The 'flutter create' template should be perfectly compatible with 'flutter build'
-          # of the same version.
-          flutter build apk --release
+        run: flutter build apk --release
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
