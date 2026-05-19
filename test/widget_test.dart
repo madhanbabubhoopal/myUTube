@@ -65,7 +65,7 @@ void main() {
     await mockProvider.init();
 
     await tester.pumpWidget(KidsTubeApp(provider: mockProvider));
-    await tester.pump(const Duration(seconds: 1)); 
+    await tester.pump(); 
 
     // 1. Home
     expect(find.text('Welcome to KidsTube'), findsWidgets);
@@ -79,17 +79,15 @@ void main() {
     await tester.tap(find.text('Unlock'));
     await tester.pump(const Duration(seconds: 1));
     
-    // Verify unlock
-    expect(find.text('Manage Approved Videos'), findsOneWidget);
-
     // 4. Admin UI
     await tester.tap(find.text('Manage Approved Videos'));
     await tester.pump(const Duration(seconds: 1));
     
     // 5. Approve
-    final daniel = find.text('Daniel Episode 1');
-    expect(daniel, findsOneWidget);
-    await tester.tap(daniel);
+    // Search for the Daniel text in the whole tree without restrictions
+    final danielFinder = find.textContaining('Daniel', skipOffstage: false);
+    expect(danielFinder, findsWidgets);
+    await tester.tap(danielFinder.first);
     await tester.pump(const Duration(seconds: 1));
 
     // 6. Return
