@@ -61,6 +61,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 style: const TextStyle(fontSize: 24, letterSpacing: 12),
                 decoration: InputDecoration(
                   border: const OutlineInputBorder(),
+                  hintText: 'PIN',
                   counterText: '',
                   errorText: _pinError,
                 ),
@@ -144,6 +145,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
             value: provider.isDarkMode,
             activeColor: const Color(0xFFFF0000),
             onChanged: provider.setDarkMode,
+          ),
+
+          // ── Collection Management ────────────────────────────────────
+          _sectionHeader('Collection Management'),
+          ListTile(
+            leading: const Icon(Icons.check_circle_outline, color: Color(0xFFFF0000)),
+            title: const Text('Manage Approved Videos'),
+            subtitle: const Text('Select which videos appear in Kid Mode'),
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const _ManageVideosScreen()),
+            ),
           ),
 
           // ── Parental Controls ─────────────────────────────────────────
@@ -303,6 +316,41 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _ManageVideosScreen extends StatelessWidget {
+  const _ManageVideosScreen();
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = context.watch<VideoProvider>();
+    final allVideos = provider.allVideos;
+    final isDark = provider.isDarkMode;
+
+    return Scaffold(
+      backgroundColor: isDark ? const Color(0xFF0F0F0F) : Colors.white,
+      appBar: AppBar(
+        title: const Text('Approve Videos'),
+        backgroundColor: isDark ? const Color(0xFF202020) : Colors.white,
+        foregroundColor: isDark ? Colors.white : Colors.black,
+      ),
+      body: allVideos.isEmpty
+          ? const Center(child: Text('No videos found on device.'))
+          : ListView.builder(
+              itemCount: allVideos.length,
+              itemBuilder: (context, index) {
+                final video = allVideos[index];
+                return CheckboxListTile(
+                  title: Text(video.title),
+                  subtitle: Text('${video.folderName} • ${video.formattedDuration}'),
+                  value: video.isApproved,
+                  activeColor: const Color(0xFFFF0000),
+                  onChanged: (_) => provider.toggleApproval(video.id),
+                );
+              },
+            ),
     );
   }
 }

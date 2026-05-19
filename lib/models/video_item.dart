@@ -6,6 +6,7 @@ class VideoItem {
   final Duration duration;
   final DateTime? dateAdded;
   String? thumbnailPath;
+  bool isApproved;
 
   VideoItem({
     required this.id,
@@ -15,10 +16,10 @@ class VideoItem {
     required this.duration,
     this.dateAdded,
     this.thumbnailPath,
+    this.isApproved = false,
   });
 
   /// Clean a raw filename into a human-readable title.
-  /// "my_vacation_clip.mp4" → "My Vacation Clip"
   static String cleanTitle(String filename) {
     final nameWithoutExt = filename.contains('.')
         ? filename.substring(0, filename.lastIndexOf('.'))
@@ -52,6 +53,7 @@ class VideoItem {
         'durationMs': duration.inMilliseconds,
         'dateAdded': dateAdded?.millisecondsSinceEpoch,
         'thumbnailPath': thumbnailPath,
+        'isApproved': isApproved,
       };
 
   factory VideoItem.fromJson(Map<String, dynamic> json) => VideoItem(
@@ -64,5 +66,6 @@ class VideoItem {
             ? DateTime.fromMillisecondsSinceEpoch(json['dateAdded'] as int)
             : null,
         thumbnailPath: json['thumbnailPath'] as String?,
+        isApproved: json['isApproved'] as bool? ?? false,
       );
 }

@@ -137,6 +137,19 @@ class HomeScreen extends StatelessWidget {
                 minHeight: 3,
               ),
             ),
+          // ── Version Indicator ─────────────────────────────────────────────
+          Positioned(
+            bottom: 8,
+            right: 8,
+            child: Text(
+              'v1.0.0-beta',
+              style: TextStyle(
+                color: Colors.grey.withOpacity(0.4),
+                fontSize: 9,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ],
       ),
     );

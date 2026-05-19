@@ -100,5 +100,5 @@ jobs:
             --type robo \
             --app app-release.apk \
             --device model=redfin,version=30 \
-            --timeout 2m \
-            --robo-directives text:parental_pin_field=1234
+            --timeout 3m \
+            --robo-directives text:PIN=1234,click:Profile=,click:"Manage Approved Videos"=

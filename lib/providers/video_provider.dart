@@ -31,8 +31,9 @@ class VideoProvider extends ChangeNotifier {
   List<VideoItem> get allVideos => _allVideos;
 
   List<VideoItem> get visibleVideos {
+    // Only show approved videos to the child
     final visible = _allVideos
-        .where((v) => !_hiddenFolders.contains(v.folderName))
+        .where((v) => v.isApproved && !_hiddenFolders.contains(v.folderName))
         .toList();
     if (_shuffle) visible.shuffle();
     return visible;
@@ -53,6 +54,19 @@ class VideoProvider extends ChangeNotifier {
   String get parentalPin => _parentalPin;
   List<String> get hiddenFolders => List.unmodifiable(_hiddenFolders);
   String get searchQuery => _searchQuery;
+
+  // ── Actions ────────────────────────────────────────────────────────────────
+
+  /// Toggles the approval status of a video (Parental Control).
+  Future<void> toggleApproval(String videoId) async {
+    final index = _allVideos.indexWhere((v) => v.id == videoId);
+    if (index != -1) {
+      _allVideos[index].isApproved = !_allVideos[index].isApproved;
+      await _cacheVideos();
+      _buildFolderMap();
+      notifyListeners();
+    }
+  }
 
   // ── Initialisation ─────────────────────────────────────────────────────────
 
@@ -128,6 +142,30 @@ class VideoProvider extends ChangeNotifier {
     );
 
     _allVideos = videos;
+
+    // ── Demo Mode / Initial State ─────────────────────────────────────
+    // If no videos are found, add sample entries for testing/onboarding.
+    if (_allVideos.isEmpty) {
+      _allVideos.addAll([
+        VideoItem(
+          id: 'demo_1',
+          path: '/Users/vik/projects/kidsTube/data/playtime-with-daniel/intro.mp4',
+          title: 'Welcome to KidsTube',
+          folderName: 'Playtime with Daniel',
+          duration: const Duration(minutes: 2, seconds: 30),
+          isApproved: true,
+        ),
+        VideoItem(
+          id: 'demo_2',
+          path: '/Users/vik/projects/kidsTube/data/playtime-with-daniel/episode1.mp4',
+          title: 'Daniel Episode 1',
+          folderName: 'Playtime with Daniel',
+          duration: const Duration(minutes: 11, seconds: 45),
+          isApproved: false,
+        ),
+      ]);
+    }
+
     _buildFolderMap();
     _isScanning = false;
     notifyListeners();
