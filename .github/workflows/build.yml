@@ -52,6 +52,16 @@ jobs:
           echo "flutter.versionCode=${GITHUB_RUN_NUMBER}" >> android/local.properties
           cat android/local.properties
 
+      - name: Capture Reference Template
+        run: |
+          flutter create --platforms android ref_app
+          echo "--- REFERENCE SETTINGS.GRADLE ---"
+          cat ref_app/android/settings.gradle
+          echo "--- REFERENCE ROOT BUILD.GRADLE ---"
+          cat ref_app/android/build.gradle
+          echo "--- REFERENCE APP BUILD.GRADLE ---"
+          cat ref_app/android/app/build.gradle
+
       - name: Install Flutter packages
         run: flutter pub get
 
