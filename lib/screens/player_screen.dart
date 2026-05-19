@@ -65,7 +65,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _error = 'Cannot play this video.\n${e.toString()}');
+        setState(() => _error = 
+          'Cannot play this video.\n'
+          'Tip: If this is a demo video, it might not exist on your device. '
+          'Please ensure the file is at: ${_currentVideo.path}\n'
+          'Error details: ${e.toString()}');
       }
       controller.dispose();
     }

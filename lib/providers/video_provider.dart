@@ -149,18 +149,18 @@ class VideoProvider extends ChangeNotifier {
       _allVideos.addAll([
         VideoItem(
           id: 'demo_1',
-          path: '/Users/vik/projects/kidsTube/data/playtime-with-daniel/intro.mp4',
+          path: '/storage/emulated/0/Download/welcome_kidstube.mp4',
           title: 'Welcome to KidsTube',
-          folderName: 'Playtime with Daniel',
+          folderName: 'Demo',
           duration: const Duration(minutes: 2, seconds: 30),
           isApproved: true,
         ),
         VideoItem(
           id: 'demo_2',
-          path: '/Users/vik/projects/kidsTube/data/playtime-with-daniel/episode1.mp4',
-          title: 'Daniel Episode 1',
-          folderName: 'Playtime with Daniel',
-          duration: const Duration(minutes: 11, seconds: 45),
+          path: '/storage/emulated/0/Download/tutorial.mp4',
+          title: 'How to use Parent Mode',
+          folderName: 'Demo',
+          duration: const Duration(minutes: 5, seconds: 15),
           isApproved: false,
         ),
       ]);

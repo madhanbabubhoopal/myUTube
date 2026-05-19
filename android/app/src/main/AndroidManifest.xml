@@ -8,7 +8,7 @@
     <application
         android:label="KidsTube"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@android:drawable/ic_menu_gallery">
         <activity
             android:name=".MainActivity"
             android:exported="true"

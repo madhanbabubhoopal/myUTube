@@ -16,9 +16,9 @@ class MockVideoProvider extends VideoProvider {
   final List<VideoItem> _mockVideos = [
     VideoItem(
       id: 'demo_1',
-      path: '/path/1.mp4',
+      path: '/storage/emulated/0/Download/welcome_kidstube.mp4',
       title: 'Welcome to KidsTube',
-      folderName: 'Playtime',
+      folderName: 'Demo',
       duration: const Duration(minutes: 1),
       isApproved: true,
     ),
@@ -43,8 +43,8 @@ void main() {
     final mockProvider = MockVideoProvider();
 
     await tester.pumpWidget(KidsTubeApp(provider: mockProvider));
-    await tester.pump(); // Start animations
-    await tester.pump(const Duration(milliseconds: 500)); // Wait for animations
+    await tester.pump(); 
+    await tester.pump(const Duration(milliseconds: 500)); 
 
     // Check for the demo video title
     expect(find.text('Welcome to KidsTube'), findsWidgets);
