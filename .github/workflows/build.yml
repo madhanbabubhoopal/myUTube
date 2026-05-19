@@ -52,15 +52,15 @@ jobs:
           echo "flutter.versionCode=${GITHUB_RUN_NUMBER}" >> android/local.properties
           cat android/local.properties
 
-      - name: Capture Reference Template
+      - name: Atomic Scaffold Overwrite
         run: |
-          flutter create --platforms android ref_app
-          echo "--- REFERENCE SETTINGS.GRADLE ---"
-          cat ref_app/android/settings.gradle
-          echo "--- REFERENCE ROOT BUILD.GRADLE ---"
-          cat ref_app/android/build.gradle
-          echo "--- REFERENCE APP BUILD.GRADLE ---"
-          cat ref_app/android/app/build.gradle
+          flutter create --platforms android --overwrite .
+          echo "--- GENERATED SETTINGS.GRADLE ---"
+          cat android/settings.gradle
+          echo "--- GENERATED ROOT BUILD.GRADLE ---"
+          cat android/build.gradle
+          echo "--- GENERATED APP BUILD.GRADLE ---"
+          cat android/app/build.gradle
 
       - name: Install Flutter packages
         run: flutter pub get
