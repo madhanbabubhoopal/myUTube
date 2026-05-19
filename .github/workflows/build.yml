@@ -111,4 +111,4 @@ jobs:
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Run Firebase Robo Test
-        run: gcloud firebase test android run --type robo --app app-release.apk --device model=redfin,version=30 --timeout 3m --robo-directives text:PIN=1234,click:Profile=,click:"Manage Approved Videos"=
+        run: gcloud firebase test android run --type robo --app app-release.apk --device model=redfin,version=30 --timeout 3m --robo-directives text:PIN=1234
