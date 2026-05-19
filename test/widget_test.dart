@@ -4,6 +4,7 @@ import 'package:kidstube/app.dart';
 import 'package:kidstube/screens/player_screen.dart';
 import 'package:kidstube/providers/video_provider.dart';
 import 'package:kidstube/models/video_item.dart';
+import 'package:kidstube/widgets/video_card.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -69,10 +70,11 @@ void main() {
 
     // Start App
     await tester.pumpWidget(KidsTubeApp(provider: mockProvider));
-    await tester.pump(const Duration(milliseconds: 500));
+    await tester.pumpAndSettle();
 
     // Verify initial approved video is visible
     expect(find.text('Welcome to KidsTube'), findsOneWidget);
+    expect(find.byType(VideoCard), findsOneWidget);
 
     // Navigate to Settings
     await tester.tap(find.text('Profile'));
@@ -98,7 +100,8 @@ void main() {
     await tester.tap(find.text('Home'));
     await tester.pumpAndSettle();
 
-    // Verify visibility - use findsWidgets in case it appears in multiple places (List + Player)
-    expect(find.text('Daniel Episode 1'), findsWidgets);
+    // Verify visibility - use findsWidgets and check count
+    expect(find.byType(VideoCard), findsNWidgets(2));
+    expect(find.textContaining('Daniel'), findsWidgets);
   });
 }
