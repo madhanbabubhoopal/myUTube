@@ -50,6 +50,7 @@ jobs:
           echo "flutter.buildMode=release"      >> android/local.properties
           echo "flutter.versionName=${GITHUB_REF_NAME#v}" >> android/local.properties
           echo "flutter.versionCode=${GITHUB_RUN_NUMBER}" >> android/local.properties
+          cat android/local.properties
 
       - name: Install Flutter packages
         run: flutter pub get
