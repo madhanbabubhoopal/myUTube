@@ -15,6 +15,9 @@ class MockVideoProvider extends VideoProvider {
   bool get isLoading => _mockLoading;
   
   @override
+  bool get isScanning => false;
+
+  @override
   List<VideoItem> get allVideos => _mockVideos;
 
   @override
@@ -64,20 +67,16 @@ void main() {
     final mockProvider = MockVideoProvider();
     await mockProvider.init();
 
-    await tester.pumpWidget(
-      ChangeNotifierProvider<VideoProvider>.value(
-        value: mockProvider,
-        child: const KidsTubeApp(),
-      ),
-    );
-    await tester.pumpAndSettle();
+    // Start App with the mock provider
+    await tester.pumpWidget(KidsTubeApp(provider: mockProvider));
+    await tester.pump(); // Initial frame
 
     // Verify initial approved video is visible
     expect(find.text('Welcome to KidsTube'), findsOneWidget);
     expect(find.text('Daniel Episode 1'), findsNothing);
 
-    // Navigate to Settings
-    await tester.tap(find.text('Profile'));
+    // Navigate to Settings (Profile tab)
+    await tester.tap(find.byIcon(Icons.person_outline));
     await tester.pumpAndSettle();
 
     // Enter PIN
@@ -88,13 +87,17 @@ void main() {
     // Approve Video
     await tester.tap(find.text('Manage Approved Videos'));
     await tester.pumpAndSettle();
+    
+    // Tap Daniel Episode 1 (it's a CheckboxListTile)
     await tester.tap(find.text('Daniel Episode 1'));
     await tester.pumpAndSettle();
 
     // Back to Home
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pumpAndSettle();
-    await tester.tap(find.text('Home'));
+    
+    // Tap Home icon in BottomNav
+    await tester.tap(find.byIcon(Icons.home_outlined));
     await tester.pumpAndSettle();
 
     // Verify visibility

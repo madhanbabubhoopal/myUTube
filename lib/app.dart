@@ -10,10 +10,18 @@ import 'widgets/bottom_nav.dart';
 import 'widgets/kidstube_logo.dart';
 
 class KidsTubeApp extends StatelessWidget {
-  const KidsTubeApp({super.key});
+  final VideoProvider? provider;
+  const KidsTubeApp({super.key, this.provider});
 
   @override
   Widget build(BuildContext context) {
+    if (provider != null) {
+      return ChangeNotifierProvider<VideoProvider>.value(
+        value: provider!,
+        child: const _ThemeWrapper(),
+      );
+    }
+
     return ChangeNotifierProvider(
       create: (_) => VideoProvider()..init(),
       child: const _ThemeWrapper(),
