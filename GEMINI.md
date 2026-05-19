@@ -27,3 +27,15 @@ KidsTube is a YouTube-style local video player for kids. It is designed to work 
 - **Curator Mode:** The app defaults to "Kid Mode" (only approved videos). "Parent Mode" is used to whitelist files.
 - **Verification:** Every push triggers a build and local tests.
 - **Video Playback:** Ensure Android-specific paths (e.g., `/storage/emulated/0/...`) are used. macOS local paths will cause `Source error` on device.
+
+## Autonomous Feature Workflow
+The agent follows a strict loop for feature development to ensure stability and documentation alignment:
+1. **Feature Implementation:** Develop the feature using idiomatic Flutter/Android patterns.
+2. **Local Verification:**
+   - Run `flutter test` for unit/widget tests.
+   - Run `./gradlew assembleDebug` to ensure Android build integrity.
+3. **Dependency Check:** If any build configuration or dependencies changed, update `dependencies-map.md` to reflect the new "Golden" state.
+4. **Documentation:** Update `GEMINI.md` if new architectural patterns or workflows are established.
+5. **Commit & Push:** Once local verification passes, commit and push.
+6. **Failure Loop:** If CI/CD (GitHub Actions) or local builds fail, the agent must diagnose, fix, and re-verify until the build is green.
+7. **Testing:** Ensure new features include relevant unit tests and, where applicable, instructions or scripts for Robo tests.

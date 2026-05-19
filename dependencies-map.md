@@ -38,7 +38,7 @@ The project is fully aligned with the modernized declarative Gradle structure. L
 | **Flutter** | `stable` | Framework SDK |
 | **Gradle** | `8.14` | Build Automation |
 | **AGP** | `8.11.1` | Android Gradle Plugin |
-| **Kotlin** | `2.2.20` | Language Runtime |
+| **Kotlin** | `2.2.20` (`kotlin-android`) | Language Runtime |
 | **JDK** | `17` | Compilation Environment |
 | **Target SDK** | `35` | Android API Level |
 
