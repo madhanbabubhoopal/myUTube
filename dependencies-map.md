@@ -51,5 +51,6 @@ The project is fully aligned with the modernized declarative Gradle structure. L
 
 ## Strategy for Smooth Builds
 1. **Single Source of Truth:** All versioning MUST stay in `settings.gradle`.
-2. **Root build.gradle:** Keep it clean. No plugin versions or dependencies should be added here.
+2. **Explicit Repositories:** Keep `allprojects` in `build.gradle` with the Flutter Maven URL (`https://storage.googleapis.com/download.flutter.io`) to ensure background compilation tasks (like Kotlin) have immediate access to SDK classes.
+3. **Root build.gradle:** Keep it clean except for shared repositories.
 3. **Resource Protection:** Do not modify `android/app/src/main/res` without verifying existence.
