@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kidstube/app.dart';
-import 'package:kidstube/screens/player_screen.dart';
 import 'package:kidstube/providers/video_provider.dart';
 import 'package:kidstube/models/video_item.dart';
 import 'package:kidstube/widgets/video_card.dart';
@@ -9,11 +8,10 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MockVideoProvider extends VideoProvider {
-  bool _mockLoading = false;
   List<VideoItem> _mockVideos = [];
 
   @override
-  bool get isLoading => _mockLoading;
+  bool get isLoading => false;
   
   @override
   bool get isScanning => false;
@@ -26,7 +24,6 @@ class MockVideoProvider extends VideoProvider {
 
   @override
   Future<void> init() async {
-    _mockLoading = false;
     _mockVideos = [
       VideoItem(
         id: 'demo_1',
@@ -67,37 +64,39 @@ void main() {
     final mockProvider = MockVideoProvider();
     await mockProvider.init();
 
-    // Start App
     await tester.pumpWidget(KidsTubeApp(provider: mockProvider));
     await tester.pump(); 
 
-    // Verify initial approved video is visible
+    // 1. Initial State
     expect(find.text('Welcome to KidsTube'), findsWidgets);
 
-    // Navigate to Settings
+    // 2. Settings -> PIN
     await tester.tap(find.text('Profile'));
     await tester.pump(const Duration(milliseconds: 500));
-
-    // Enter PIN
+    
     await tester.enterText(find.byType(TextField), '1234');
     await tester.tap(find.text('Unlock'));
     await tester.pump(const Duration(milliseconds: 500));
 
-    // Approve Video
+    // 3. Collection Management
+    expect(find.text('Manage Approved Videos'), findsOneWidget);
     await tester.tap(find.text('Manage Approved Videos'));
     await tester.pump(const Duration(milliseconds: 500));
     
-    await tester.tap(find.text('Daniel Episode 1'));
+    // 4. Toggle Approval
+    final danielFinder = find.textContaining('Daniel');
+    expect(danielFinder, findsWidgets);
+    await tester.tap(danielFinder.first);
     await tester.pump(const Duration(milliseconds: 500));
 
-    // Back to Home
+    // 5. Back to Home
     await tester.tap(find.byIcon(Icons.arrow_back));
     await tester.pump(const Duration(milliseconds: 500));
     
     await tester.tap(find.text('Home'));
     await tester.pump(const Duration(milliseconds: 500));
 
-    // Verify visibility
-    expect(find.textContaining('Daniel'), findsWidgets);
+    // 6. Verify Visibility
+    expect(find.byType(VideoCard), findsNWidgets(2));
   });
 }
