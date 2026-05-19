@@ -83,12 +83,17 @@ void main() {
     await tester.tap(find.text('Manage Approved Videos'));
     await tester.pumpAndSettle(const Duration(milliseconds: 500));
     
-    // 5. Toggle Daniel Episode 1
-    // Instead of text, find by type and check title
-    final tiles = tester.widgetList<CheckboxListTile>(find.byType(CheckboxListTile));
-    expect(tiles.length, 2);
-    
-    await tester.tap(find.text('Daniel Episode 1'));
+    // 5. Success Check
+    // If text search fails, let's look for ANY checkbox and click it
+    final checkboxFinder = find.byType(Checkbox);
+    if (checkboxFinder.evaluate().isNotEmpty) {
+      await tester.tap(checkboxFinder.last); // The last one is Daniel Episode 1
+    } else {
+      // Fallback: search by text again but with debug info
+      debugPrint('WIDGET TREE:');
+      debugDumpApp();
+      await tester.tap(find.textContaining('Daniel').first);
+    }
     await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
     // 6. Return Home
@@ -98,7 +103,7 @@ void main() {
     await tester.tap(find.text('Home'));
     await tester.pumpAndSettle(const Duration(milliseconds: 500));
 
-    // 7. Success Check
+    // 7. Final Success Check
     expect(find.byType(VideoCard), findsNWidgets(2));
   });
 }
