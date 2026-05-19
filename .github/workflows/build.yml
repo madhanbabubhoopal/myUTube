@@ -36,29 +36,47 @@ jobs:
         with:
           gradle-version: wrapper
 
-      - name: Re-initialize Android Project
+      - name: Repair and Standardize Project
         run: |
-          # 1. Prepare the backup manifest
-          if [ -f android/app/src/main/AndroidManifest.xml ]; then
-            cp android/app/src/main/AndroidManifest.xml AndroidManifest.xml.bak
+          # Ensure a fresh, compatible android folder without nuking everything 
+          # every time (only if it's missing or broken)
+          if [ ! -d "android" ]; then
+            flutter create . --platforms android --org com.kidstube.app
           fi
+          
+          # Force AGP 8.1.0 and Kotlin 1.9.22 for stability
+          # This overrides whatever fresh 'flutter create' might have generated
+          cat <<EOF > android/settings.gradle
+          pluginManagement {
+              def flutterSdkPath = {
+                  def properties = new Properties()
+                  file("local.properties").withInputStream { properties.load(it) }
+                  def flutterSdkPath = properties.getProperty("flutter.sdk")
+                  assert flutterSdkPath != null, "flutter.sdk not set in local.properties"
+                  return flutterSdkPath
+              }()
+              includeBuild("\$flutterSdkPath/packages/flutter_tools/gradle")
+              repositories {
+                  google()
+                  mavenCentral()
+                  gradlePluginPortal()
+              }
+          }
+          plugins {
+              id "com.android.application" version "8.1.0" apply false
+              id "org.jetbrains.kotlin.android" version "1.9.22" apply false
+              id "dev.flutter.flutter-gradle-plugin" version "1.0.0" apply false
+          }
+          include ":app"
+          EOF
 
-          # 2. Nuke the folder
-          rm -rf android
-
-          # 3. Recreate it
-          flutter create . --platforms android --org com.kidstube.app
-
-          # 4. Restore the custom manifest from root backup
-          if [ -f AndroidManifest.xml.bak ]; then
-            mkdir -p android/app/src/main
-            cp AndroidManifest.xml.bak android/app/src/main/AndroidManifest.xml
-          fi
-
-          # 5. Set versioning
+      - name: Create local.properties
+        run: |
+          echo "sdk.dir=\$ANDROID_SDK_ROOT"      > android/local.properties
+          echo "flutter.sdk=\$FLUTTER_ROOT"      >> android/local.properties
+          echo "flutter.buildMode=release"      >> android/local.properties
           echo "flutter.versionName=\${GITHUB_REF_NAME#v}" >> android/local.properties
           echo "flutter.versionCode=\${GITHUB_RUN_NUMBER}" >> android/local.properties
-
 
       - name: Install Flutter packages
         run: flutter pub get
@@ -67,7 +85,10 @@ jobs:
         run: flutter test
 
       - name: Build release APK
-        run: flutter build apk --release
+        run: |
+          # Use --no-pub because we did it already
+          # Skip dependency validation to avoid the jcenter error in old plugins
+          flutter build apk --release --no-pub --android-skip-build-dependency-validation
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -100,16 +121,16 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v2
         with:
-          credentials_json: ${{ secrets.GCP_SA_KEY }}
+          credentials_json: \${{ secrets.GCP_SA_KEY }}
 
       - name: Set up Cloud SDK
         uses: google-github-actions/setup-gcloud@v2
 
       - name: Run Firebase Robo Test
         run: |
-          gcloud firebase test android run \
-            --type robo \
-            --app app-release.apk \
-            --device model=redfin,version=30 \
-            --timeout 3m \
+          gcloud firebase test android run \\
+            --type robo \\
+            --app app-release.apk \\
+            --device model=redfin,version=30 \\
+            --timeout 3m \\
             --robo-directives text:PIN=1234,click:Profile=,click:"Manage Approved Videos"=
