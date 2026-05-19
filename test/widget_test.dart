@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:kidstube/app.dart';
+import 'package:kidstube/screens/player_screen.dart';
 import 'package:kidstube/providers/video_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
