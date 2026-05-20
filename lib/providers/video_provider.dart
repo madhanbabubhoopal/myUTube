@@ -25,6 +25,7 @@ class VideoProvider extends ChangeNotifier {
   bool _isDarkMode = false;
   String _parentalPin = '1234';
   List<String> _hiddenFolders = [];
+  List<String> _whitelistedFolders = [];
   String _searchQuery = '';
 
   // ── Getters ────────────────────────────────────────────────────────────────
@@ -32,8 +33,11 @@ class VideoProvider extends ChangeNotifier {
 
   List<VideoItem> get visibleVideos {
     // Only show approved videos to the child
+    // OR videos that are in a whitelisted folder
     final visible = _allVideos
-        .where((v) => v.isApproved && !_hiddenFolders.contains(v.folderName))
+        .where((v) =>
+            (v.isApproved || _whitelistedFolders.contains(v.folderName)) &&
+            !_hiddenFolders.contains(v.folderName))
         .toList();
     if (_shuffle) visible.shuffle();
     return visible;
@@ -53,6 +57,7 @@ class VideoProvider extends ChangeNotifier {
   bool get isDarkMode => _isDarkMode;
   String get parentalPin => _parentalPin;
   List<String> get hiddenFolders => List.unmodifiable(_hiddenFolders);
+  List<String> get whitelistedFolders => List.unmodifiable(_whitelistedFolders);
   String get searchQuery => _searchQuery;
 
   // ── Actions ────────────────────────────────────────────────────────────────
@@ -70,12 +75,22 @@ class VideoProvider extends ChangeNotifier {
 
   /// Toggles approval for an entire folder.
   Future<void> toggleFolderApproval(String folderName, bool approved) async {
+    if (approved) {
+      if (!_whitelistedFolders.contains(folderName)) {
+        _whitelistedFolders.add(folderName);
+      }
+    } else {
+      _whitelistedFolders.remove(folderName);
+    }
+
+    // Still sync individual items for backward compatibility and granular control
     for (var video in _allVideos) {
       if (video.folderName == folderName) {
         video.isApproved = approved;
       }
     }
     await _cacheVideos();
+    await _saveWhitelistedFolders();
     _buildFolderMap();
     notifyListeners();
   }
@@ -105,6 +120,7 @@ class VideoProvider extends ChangeNotifier {
     _isDarkMode = prefs.getBool('isDarkMode') ?? false;
     _parentalPin = prefs.getString('parentalPin') ?? '1234';
     _hiddenFolders = prefs.getStringList('hiddenFolders') ?? [];
+    _whitelistedFolders = prefs.getStringList('whitelistedFolders') ?? [];
   }
 
   Future<void> _loadCachedVideos() async {
@@ -125,6 +141,11 @@ class VideoProvider extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final encoded = jsonEncode(_allVideos.map((v) => v.toJson()).toList());
     await prefs.setString('cachedVideos', encoded);
+  }
+
+  Future<void> _saveWhitelistedFolders() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('whitelistedFolders', _whitelistedFolders);
   }
 
   // ── Scanning ───────────────────────────────────────────────────────────────
