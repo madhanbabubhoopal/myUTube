@@ -28,7 +28,8 @@ The project is fully modernized using Kotlin DSL (`.kts`) and perfectly aligned 
 ## Moving Parts & Verified Baseline
 1. **Kotlin DSL:** Fully migrated to `.kts` files.
 2. **Built-in Kotlin:** Successfully integrated. The Flutter plugin handles Kotlin compilation automatically.
-3. **APK Location:** Standard build paths restored to ensure CI artifact collection.
+3. **Bundled Assets:** Added `assets/videos/demo_video.mp4` (13MB) as a permanent 'Empty State' baseline for Kid Mode.
+4. **APK Location:** Standard build paths restored to ensure CI artifact collection.
 4. **CI/CD:** Ubuntu runner, Node 20, JDK 17, Flutter Stable.
 
 ## Golden Configuration Reference

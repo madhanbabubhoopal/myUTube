@@ -5,7 +5,7 @@
 - [x] Build PIN-protected "Manage Approved Videos" UI in Settings.
 - [x] Filter Home Screen and Clips to only show approved content.
 - [x] Add version indicator (v1.0.0-beta) to landing page.
-- [ ] **Next:** Improve the "Empty State" for Kid Mode (show a friendly message if no videos are approved yet).
+- [x] **Next:** Improve the "Empty State" for Kid Mode (integrated a built-in demo video for immediate playback).
 
 ## Phase 2: YouTube UI Polish
 - [ ] **Skeleton Loaders:** Add shimmer effects during thumbnail generation.
