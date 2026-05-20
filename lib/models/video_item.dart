@@ -7,6 +7,7 @@ class VideoItem {
   final DateTime? dateAdded;
   String? thumbnailPath;
   bool isApproved;
+  final bool isAsset;
 
   VideoItem({
     required this.id,
@@ -17,6 +18,7 @@ class VideoItem {
     this.dateAdded,
     this.thumbnailPath,
     this.isApproved = false,
+    this.isAsset = false,
   });
 
   /// Clean a raw filename into a human-readable title.
@@ -54,6 +56,7 @@ class VideoItem {
         'dateAdded': dateAdded?.millisecondsSinceEpoch,
         'thumbnailPath': thumbnailPath,
         'isApproved': isApproved,
+        'isAsset': isAsset,
       };
 
   factory VideoItem.fromJson(Map<String, dynamic> json) => VideoItem(
@@ -67,5 +70,6 @@ class VideoItem {
             : null,
         thumbnailPath: json['thumbnailPath'] as String?,
         isApproved: json['isApproved'] as bool? ?? false,
+        isAsset: json['isAsset'] as bool? ?? false,
       );
 }

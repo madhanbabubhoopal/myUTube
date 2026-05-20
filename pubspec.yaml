@@ -39,4 +39,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
-  # No asset files — logo uses CustomPainter, thumbnails generated at runtime
+  assets:
+    - assets/videos/demo_video.mp4

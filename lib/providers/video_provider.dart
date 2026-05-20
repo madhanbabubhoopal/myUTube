@@ -144,27 +144,18 @@ class VideoProvider extends ChangeNotifier {
     _allVideos = videos;
 
     // ── Demo Mode / Initial State ─────────────────────────────────────
-    // If no videos are found, add sample entries for testing/onboarding.
-    if (_allVideos.isEmpty) {
-      _allVideos.addAll([
-        VideoItem(
-          id: 'demo_1',
-          path: '/storage/emulated/0/Download/welcome_kidstube.mp4',
-          title: 'Welcome to KidsTube',
-          folderName: 'Demo',
-          duration: const Duration(minutes: 2, seconds: 30),
-          isApproved: true,
-        ),
-        VideoItem(
-          id: 'demo_2',
-          path: '/storage/emulated/0/Download/tutorial.mp4',
-          title: 'How to use Parent Mode',
-          folderName: 'Demo',
-          duration: const Duration(minutes: 5, seconds: 15),
-          isApproved: false,
-        ),
-      ]);
-    }
+    // Add the bundled asset video to the list. It is always approved.
+    _allVideos.add(
+      VideoItem(
+        id: 'bundled_demo',
+        path: 'assets/videos/demo_video.mp4',
+        title: 'Welcome to KidsTube',
+        folderName: 'KidsTube Demo',
+        duration: const Duration(minutes: 0, seconds: 47),
+        isApproved: true,
+        isAsset: true,
+      ),
+    );
 
     _buildFolderMap();
     _isScanning = false;
@@ -185,7 +176,7 @@ class VideoProvider extends ChangeNotifier {
 
   void _generateThumbnailsInBackground() async {
     for (final video in List<VideoItem>.from(_allVideos)) {
-      if (video.thumbnailPath != null) continue;
+      if (video.thumbnailPath != null || video.isAsset) continue;
       final thumbPath = await ThumbnailHelper.generateThumbnail(video.path);
       if (thumbPath != null) {
         video.thumbnailPath = thumbPath;

@@ -45,10 +45,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
     final provider = context.read<VideoProvider>();
     _upNext = provider.getUpNext(_currentVideo);
 
-    // CORRECT approach for Android 13: use dart:io File.
-    // Do NOT use networkUrl(Uri.parse('file://...')) — it fails on Android 13.
-    final controller =
-        VideoPlayerController.file(File(_currentVideo.path));
+    final controller = _currentVideo.isAsset
+        ? VideoPlayerController.asset(_currentVideo.path)
+        : VideoPlayerController.file(File(_currentVideo.path));
 
     try {
       await controller.initialize();
@@ -67,8 +66,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
       if (mounted) {
         setState(() => _error = 
           'Cannot play this video.\n'
-          'Tip: If this is a demo video, it might not exist on your device. '
-          'Please ensure the file is at: ${_currentVideo.path}\n'
+          'Tip: If this is a local file, ensure it exists at: ${_currentVideo.path}\n'
           'Error details: ${e.toString()}');
       }
       controller.dispose();
