@@ -68,6 +68,18 @@ class VideoProvider extends ChangeNotifier {
     }
   }
 
+  /// Toggles approval for an entire folder.
+  Future<void> toggleFolderApproval(String folderName, bool approved) async {
+    for (var video in _allVideos) {
+      if (video.folderName == folderName) {
+        video.isApproved = approved;
+      }
+    }
+    await _cacheVideos();
+    _buildFolderMap();
+    notifyListeners();
+  }
+
   // ── Initialisation ─────────────────────────────────────────────────────────
 
   /// Call on app start. Loads cache first for instant display, then rescans.
@@ -153,6 +165,19 @@ class VideoProvider extends ChangeNotifier {
         folderName: 'KidsTube Demo',
         duration: const Duration(minutes: 0, seconds: 47),
         isApproved: true,
+        isAsset: true,
+      ),
+    );
+
+    // Add the secondary admin-flow demo. It is NOT approved by default.
+    _allVideos.add(
+      VideoItem(
+        id: 'admin_demo',
+        path: 'assets/videos/admin_demo.mp4',
+        title: 'Parent Mode Tutorial',
+        folderName: 'Parent Tips',
+        duration: const Duration(minutes: 0, seconds: 15),
+        isApproved: false,
         isAsset: true,
       ),
     );

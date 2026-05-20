@@ -326,7 +326,7 @@ class _ManageVideosScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final provider = context.watch<VideoProvider>();
-    final allVideos = provider.allVideos;
+    final videosByFolder = provider.videosByFolder;
     final isDark = provider.isDarkMode;
 
     return Scaffold(
@@ -336,18 +336,34 @@ class _ManageVideosScreen extends StatelessWidget {
         backgroundColor: isDark ? const Color(0xFF202020) : Colors.white,
         foregroundColor: isDark ? Colors.white : Colors.black,
       ),
-      body: allVideos.isEmpty
+      body: videosByFolder.isEmpty
           ? const Center(child: Text('No videos found on device.'))
           : ListView.builder(
-              itemCount: allVideos.length,
+              itemCount: videosByFolder.length,
               itemBuilder: (context, index) {
-                final video = allVideos[index];
-                return CheckboxListTile(
-                  title: Text(video.title),
-                  subtitle: Text('${video.folderName} • ${video.formattedDuration}'),
-                  value: video.isApproved,
-                  activeColor: const Color(0xFFFF0000),
-                  onChanged: (_) => provider.toggleApproval(video.id),
+                final folderName = videosByFolder.keys.elementAt(index);
+                final videos = videosByFolder[folderName]!;
+                final allApproved = videos.every((v) => v.isApproved);
+                final someApproved = videos.any((v) => v.isApproved) && !allApproved;
+
+                return ExpansionTile(
+                  title: Text(folderName, style: const TextStyle(fontWeight: FontWeight.bold)),
+                  subtitle: Text('${videos.length} videos'),
+                  leading: Checkbox(
+                    value: allApproved,
+                    tristate: someApproved,
+                    activeColor: const Color(0xFFFF0000),
+                    onChanged: (val) => provider.toggleFolderApproval(folderName, val ?? false),
+                  ),
+                  children: videos.map((video) {
+                    return CheckboxListTile(
+                      title: Text(video.title),
+                      subtitle: Text(video.formattedDuration),
+                      value: video.isApproved,
+                      activeColor: const Color(0xFFFF0000),
+                      onChanged: (_) => provider.toggleApproval(video.id),
+                    );
+                  }).toList(),
                 );
               },
             ),
