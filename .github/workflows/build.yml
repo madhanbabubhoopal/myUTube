@@ -50,24 +50,6 @@ jobs:
           echo "flutter.buildMode=release"      >> android/local.properties
           echo "flutter.versionName=${GITHUB_REF_NAME#v}" >> android/local.properties
           echo "flutter.versionCode=${GITHUB_RUN_NUMBER}" >> android/local.properties
-          cat android/local.properties
-
-      - name: Atomic Scaffold and Restore
-        run: |
-          # 1. Scaffold fresh Android files (will create .kts files)
-          flutter create --platforms android --overwrite .
-          
-          # 2. Restore project-specific files
-          git checkout pubspec.yaml lib/ test/ android/app/src/main/AndroidManifest.xml
-          
-          # 3. Clean up the old Groovy files to avoid conflicts
-          rm -f android/settings.gradle android/build.gradle android/app/build.gradle
-          
-          # 4. Diagnostic: Show generated files
-          echo "--- GENERATED SETTINGS.GRADLE.KTS ---"
-          cat android/settings.gradle.kts
-          echo "--- GENERATED APP BUILD.GRADLE.KTS ---"
-          cat android/app/build.gradle.kts
 
       - name: Install Flutter packages
         run: flutter pub get
