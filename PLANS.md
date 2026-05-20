@@ -10,7 +10,7 @@
 ## Phase 2: Advanced Curation (Current Focus)
 - [ ] **Admin Verification Video:** Add a second bundled video (`admin_demo.mp4`) that is *unapproved* by default. Testing: Approve it in Parent Mode and verify it appears in Kid Mode.
 - [ ] **Folder-Level Approval:** Implement logic to approve/disapprove an entire folder at once. 
-- [ ] **Targeted Access:** Update the UI to prioritize folder-based whitelisting over individual file management.
+- [x] **Targeted Access:** Implemented folder-based whitelisting and logic verification via unit tests.
 
 ## Phase 3: YouTube UI Polish
 - [ ] **Skeleton Loaders:** Add shimmer effects during thumbnail generation.
