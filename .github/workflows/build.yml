@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - 'claude/offline-youtube-flutter-app-qfEO1'
+      - 'feature/*'
       - main
     tags:
       - 'v*'
