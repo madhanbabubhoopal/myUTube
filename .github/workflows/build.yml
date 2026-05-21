@@ -61,29 +61,50 @@ jobs:
       - name: Build release APK
         run: flutter build apk --release
 
-      - name: Locate APKs on failure
-        if: always()
-        run: find . -name "*.apk"
+      - name: Build Android Test APK
+        run: |
+          pushd android
+          ./gradlew app:assembleAndroidTest
+          ./gradlew app:assembleDebug -Ptarget=integration_test/app_test.dart
+          popd
 
-      - name: Show diff on failure
-        if: failure()
-        run: git diff
-
-      - name: Upload APK artifact
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: kidstube-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 30
+          name: kidstube-test-apks
+          path: |
+            build/app/outputs/apk/debug/app-debug.apk
+            build/app/outputs/apk/androidTest/release/app-release-androidTest.apk
+          retention-days: 7
 
-      - name: Create Release
-        if: startsWith(github.ref, 'refs/tags/v')
-        uses: softprops/action-gh-release@v2
+  integration-test:
+    needs: build-apk
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Download Test APKs
+        uses: actions/download-artifact@v4
         with:
-          files: build/app/outputs/flutter-apk/app-release.apk
-          generate_release_notes: true
-          draft: false
-          prerelease: false
+          name: kidstube-test-apks
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          credentials_json: ${{ secrets.GCP_SA_KEY }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Run Integration Tests on Firebase Test Lab
+        run: |
+          gcloud firebase test android run \
+            --type instrumentation \
+            --app build/app/outputs/apk/debug/app-debug.apk \
+            --test build/app/outputs/apk/androidTest/release/app-release-androidTest.apk \
+            --device model=redfin,version=30 \
+            --timeout 5m
 
   robo-test:
     needs: build-apk
