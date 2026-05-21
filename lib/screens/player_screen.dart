@@ -102,7 +102,11 @@ class _PlayerScreenState extends State<PlayerScreen> {
         DeviceOrientation.landscapeLeft,
         DeviceOrientation.landscapeRight,
       ]);
-      SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
+      // Use immersiveSticky for notched displays like Redmi 13C
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.immersiveSticky,
+        overlays: [],
+      );
     } else {
       _exitFullscreen();
     }
@@ -159,9 +163,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
+      body: SafeArea(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
           // Player at ~40% (16:9)
           AspectRatio(
             aspectRatio: 16 / 9,

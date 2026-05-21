@@ -1,27 +1,8 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
-
-/// Parameters struct passed to the background isolate.
-class _ThumbnailParams {
-  final String videoPath;
-  final String outputDir;
-  final String cacheKey;
-
-  const _ThumbnailParams({
-    required this.videoPath,
-    required this.outputDir,
-    required this.cacheKey,
-  });
-}
-
-/// Top-level function — required by compute() (must not be a closure).
-Future<String?> _generateInIsolate(_ThumbnailParams params) async {
-  // Placeholder: In a real app we would use photo_manager or another 
-  // library that doesn't use deprecated JCenter repositories.
-  // For now, return null so the UI shows the movie icon placeholder.
-  return null;
-}
+import 'package:photo_manager/photo_manager.dart';
 
 class ThumbnailHelper {
   static String? _cacheDir;
@@ -43,8 +24,34 @@ class ThumbnailHelper {
     return hash.toString();
   }
 
-  static Future<String?> generateThumbnail(String videoPath) async {
-    return null; // Simplified for now to fix build stability
+  /// Generates a thumbnail for a video.
+  /// If [videoId] is provided, uses photo_manager (most efficient).
+  /// Otherwise fallbacks to path-based generation (if implemented).
+  static Future<String?> generateThumbnail(String videoPath, {String? videoId}) async {
+    try {
+      final cacheDir = await _getCacheDir();
+      final fileName = '${_hashPath(videoPath)}.jpg';
+      final file = File('$cacheDir/$fileName');
+
+      if (file.existsSync()) return file.path;
+
+      if (videoId != null) {
+        final asset = await AssetEntity.fromId(videoId);
+        if (asset != null) {
+          final data = await asset.thumbnailDataWithSize(
+            const ThumbnailSize(400, 225), // 16:9 ratio
+          );
+          if (data != null) {
+            await file.writeAsBytes(data);
+            return file.path;
+          }
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint('Error generating thumbnail: $e');
+      return null;
+    }
   }
 
   static Future<void> clearCache() async {

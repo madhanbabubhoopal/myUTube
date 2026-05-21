@@ -9,6 +9,7 @@ import '../utils/thumbnail_helper.dart';
 class VideoProvider extends ChangeNotifier {
   // ── State ──────────────────────────────────────────────────────────────────
   List<VideoItem> _allVideos = [];
+  List<VideoItem> _visibleVideos = [];
   List<VideoItem> _searchResults = [];
   Map<String, List<VideoItem>> _videosByFolder = {};
 
@@ -31,16 +32,16 @@ class VideoProvider extends ChangeNotifier {
   // ── Getters ────────────────────────────────────────────────────────────────
   List<VideoItem> get allVideos => _allVideos;
 
-  List<VideoItem> get visibleVideos {
-    // Only show approved videos to the child
-    // OR videos that are in a whitelisted folder
-    final visible = _allVideos
+  List<VideoItem> get visibleVideos => _visibleVideos;
+
+  void _updateVisibleVideos() {
+    _visibleVideos = _allVideos
         .where((v) =>
             (v.isApproved || _whitelistedFolders.contains(v.folderName)) &&
             !_hiddenFolders.contains(v.folderName))
         .toList();
-    if (_shuffle) visible.shuffle();
-    return visible;
+    if (_shuffle) _visibleVideos.shuffle();
+    notifyListeners();
   }
 
   List<VideoItem> get searchResults => _searchResults;
@@ -68,8 +69,8 @@ class VideoProvider extends ChangeNotifier {
     if (index != -1) {
       _allVideos[index].isApproved = !_allVideos[index].isApproved;
       await _cacheVideos();
+      _updateVisibleVideos();
       _buildFolderMap();
-      notifyListeners();
     }
   }
 
@@ -91,8 +92,8 @@ class VideoProvider extends ChangeNotifier {
     }
     await _cacheVideos();
     await _saveWhitelistedFolders();
+    _updateVisibleVideos();
     _buildFolderMap();
-    notifyListeners();
   }
 
   // ── Initialisation ─────────────────────────────────────────────────────────
@@ -203,6 +204,7 @@ class VideoProvider extends ChangeNotifier {
       ),
     );
 
+    _updateVisibleVideos();
     _buildFolderMap();
     _isScanning = false;
     notifyListeners();
@@ -223,7 +225,10 @@ class VideoProvider extends ChangeNotifier {
   void _generateThumbnailsInBackground() async {
     for (final video in List<VideoItem>.from(_allVideos)) {
       if (video.thumbnailPath != null || video.isAsset) continue;
-      final thumbPath = await ThumbnailHelper.generateThumbnail(video.path);
+      final thumbPath = await ThumbnailHelper.generateThumbnail(
+        video.path,
+        videoId: video.id,
+      );
       if (thumbPath != null) {
         video.thumbnailPath = thumbPath;
         notifyListeners();
@@ -275,7 +280,7 @@ class VideoProvider extends ChangeNotifier {
     _shuffle = value;
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool('shuffle', value);
-    notifyListeners();
+    _updateVisibleVideos();
   }
 
   Future<void> setDarkMode(bool value) async {
