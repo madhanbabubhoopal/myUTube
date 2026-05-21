@@ -61,13 +61,6 @@ jobs:
       - name: Build Release APK
         run: flutter build apk --release
 
-      - name: Upload Release APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: kidstube-release-apk
-          path: build/app/outputs/flutter-apk/app-release.apk
-          retention-days: 30
-
       - name: Build Android Test APK
         run: |
           # Build the app with the integration test as the target
@@ -78,13 +71,28 @@ jobs:
           gradle app:assembleAndroidTest
           popd
 
+      - name: Flatten Artifacts
+        run: |
+          mkdir -p dist
+          cp build/app/outputs/flutter-apk/app-release.apk dist/
+          cp build/app/outputs/flutter-apk/app-debug.apk dist/
+          cp build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk dist/
+          ls -R dist/
+
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kidstube-release-apk
+          path: dist/app-release.apk
+          retention-days: 30
+
       - name: Upload Test APKs
         uses: actions/upload-artifact@v4
         with:
           name: kidstube-test-apks
           path: |
-            build/app/outputs/flutter-apk/app-debug.apk
-            build/app/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+            dist/app-debug.apk
+            dist/app-debug-androidTest.apk
           retention-days: 7
 
   integration-test:
