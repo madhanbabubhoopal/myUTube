@@ -58,8 +58,12 @@ jobs:
       - name: Run Tests
         run: flutter test
 
-      - name: Build release APK
-        run: flutter build apk --release
+      - name: Upload Release APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: kidstube-release-apk
+          path: build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 30
 
       - name: Build Android Test APK
         run: |
@@ -68,7 +72,7 @@ jobs:
           ./gradlew app:assembleDebug -Ptarget=integration_test/app_test.dart
           popd
 
-      - name: Upload Artifacts
+      - name: Upload Test APKs
         uses: actions/upload-artifact@v4
         with:
           name: kidstube-test-apks
@@ -101,8 +105,8 @@ jobs:
         run: |
           gcloud firebase test android run \
             --type instrumentation \
-            --app build/app/outputs/apk/debug/app-debug.apk \
-            --test build/app/outputs/apk/androidTest/release/app-release-androidTest.apk \
+            --app app-debug.apk \
+            --test app-release-androidTest.apk \
             --device model=redfin,version=30 \
             --timeout 5m
 
@@ -118,7 +122,7 @@ jobs:
         with:
           node-version: '20'
 
-      - name: Download APK artifact
+      - name: Download Release APK
         uses: actions/download-artifact@v4
         with:
           name: kidstube-release-apk
