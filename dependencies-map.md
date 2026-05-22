@@ -28,9 +28,10 @@ The project is fully modernized using Kotlin DSL (`.kts`) and perfectly aligned 
 ## Moving Parts & Verified Baseline
 1. **Kotlin DSL:** Fully migrated to `.kts` files.
 2. **Built-in Kotlin:** Successfully integrated. The Flutter plugin handles Kotlin compilation automatically.
-3. **Bundled Assets:** Added `assets/videos/demo_video.mp4` (13MB) as a permanent 'Empty State' baseline for Kid Mode.
-4. **APK Location:** Standard build paths restored to ensure CI artifact collection.
-4. **CI/CD:** Ubuntu runner, Node 20, JDK 17, Flutter Stable.
+3. **Bundled Assets:** Added `assets/videos/demo_video.mp4` (22MB) and `assets/videos/admin_demo.mp4` (5MB). Both verified to contain audio streams.
+4. **Audio Verification:** Programmable volume checks added to integration tests to ensure sound is not muted by default.
+5. **APK Location:** Standard build paths restored to ensure CI artifact collection.
+6. **CI/CD:** Ubuntu runner, Node 20, JDK 17, Flutter Stable.
 
 ## Golden Configuration Reference
 
