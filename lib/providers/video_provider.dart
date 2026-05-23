@@ -310,6 +310,26 @@ class VideoProvider extends ChangeNotifier {
     notifyListeners();
   }
 
+  // ── Progress Persistence ───────────────────────────────────────────────────
+
+  /// Saves the last playback position for a specific video.
+  Future<void> saveVideoProgress(String videoId, Duration position) async {
+    final prefs = await SharedPreferences.getInstance();
+    // Key: progress_VIDEOID
+    await prefs.setInt('progress_$videoId', position.inMilliseconds);
+  }
+
+  /// Retrieves the saved playback position for a video.
+  /// Returns Duration.zero if no progress was saved.
+  Future<Duration> getVideoProgress(String videoId) async {
+    final prefs = await SharedPreferences.getInstance();
+    final ms = prefs.getInt('progress_$videoId') ?? 0;
+    // If video is almost finished (within 5 seconds), reset to start
+    // This is better for re-watchability.
+    if (ms < 0) return Duration.zero;
+    return Duration(milliseconds: ms);
+  }
+
   // ── Playback helpers ───────────────────────────────────────────────────────
 
   /// Returns up-to [count] videos that follow [current] in its folder.

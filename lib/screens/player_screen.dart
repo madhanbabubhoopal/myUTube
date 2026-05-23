@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -33,6 +34,7 @@ class _PlayerScreenState extends State<PlayerScreen> {
   bool _showTray = false;
   bool _initialised = false;
   String? _error;
+  Timer? _progressTimer;
 
   @override
   void initState() {
@@ -51,6 +53,16 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
     try {
       await controller.initialize();
+
+      // ── Resume Progress ────────────────────────────────────────────────
+      final savedProgress = await provider.getVideoProgress(_currentVideo.id);
+      if (savedProgress > Duration.zero) {
+        // If near end, don't seek
+        if (savedProgress < controller.value.duration - const Duration(seconds: 5)) {
+          await controller.seekTo(savedProgress);
+        }
+      }
+
       controller.addListener(_onPlaybackEvent);
       if (mounted) {
         setState(() {
@@ -59,6 +71,10 @@ class _PlayerScreenState extends State<PlayerScreen> {
           _error = null;
         });
         if (provider.autoplay) _controller.play();
+
+        // Start periodic progress saving
+        _progressTimer?.cancel();
+        _progressTimer = Timer.periodic(const Duration(seconds: 5), (_) => _saveProgress());
       } else {
         controller.dispose();
       }
@@ -77,6 +93,9 @@ class _PlayerScreenState extends State<PlayerScreen> {
     if (!_initialised || !mounted) return;
     final v = _controller.value;
     if (!v.isPlaying && v.position >= v.duration && v.duration > Duration.zero) {
+      // Clear progress when finished
+      context.read<VideoProvider>().saveVideoProgress(_currentVideo.id, Duration.zero);
+
       final provider = context.read<VideoProvider>();
       if (provider.autoplay && _upNext.isNotEmpty) {
         _switchVideo(_upNext.first);
@@ -84,7 +103,17 @@ class _PlayerScreenState extends State<PlayerScreen> {
     }
   }
 
+  Future<void> _saveProgress() async {
+    if (!_initialised || !mounted || !_controller.value.isPlaying) return;
+    context.read<VideoProvider>().saveVideoProgress(
+      _currentVideo.id,
+      _controller.value.position,
+    );
+  }
+
   Future<void> _switchVideo(VideoItem video) async {
+    _progressTimer?.cancel();
+    _saveProgress(); // Final save before switch
     _controller.removeListener(_onPlaybackEvent);
     await _controller.dispose();
     setState(() {
@@ -128,6 +157,8 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   void dispose() {
+    _progressTimer?.cancel();
+    _saveProgress();
     if (_initialised) {
       _controller.removeListener(_onPlaybackEvent);
       _controller.dispose();
@@ -139,7 +170,14 @@ class _PlayerScreenState extends State<PlayerScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return _isFullscreen ? _buildFullscreen() : _buildInline();
+    return PopScope(
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) {
+          _exitFullscreen(); // Reset orientation and overlays
+        }
+      },
+      child: _isFullscreen ? _buildFullscreen() : _buildInline(),
+    );
   }
 
   // ── Inline Mode ────────────────────────────────────────────────────────
